@@ -81,7 +81,7 @@ export const ChatMessage = ({ message, taggedWords, isUser = true }: ChatMessage
                 <span key={index} className="relative inline-block group">
                   {leadingQuote}
                   <span 
-                    className={`relative ${tag ? 'font-medium px-2 py-1 rounded-md bg-primary/20 border border-primary/30' : ''}`}
+                    className={`relative ${tag ? 'font-medium px-1 py-1 rounded-md bg-primary/20 border border-primary/30' : ''}`}
                     title={tagDisplay ? tagDisplay.label : undefined}
                   >
                     {actualWord}
