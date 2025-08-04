@@ -15,8 +15,36 @@ const AVAILABLE_TAGS = [
   { value: "time", label: "Time", color: "bg-yellow-100 text-yellow-800" },
 ];
 
+const parseMessage = (text: string): string[] => {
+  // Handle quoted phrases as single words
+  const quotedPhrases = text.match(/"[^"]+"|'[^']+'/g) || [];
+  let processedText = text;
+  
+  // Replace quoted phrases with placeholders
+  quotedPhrases.forEach((phrase, index) => {
+    const placeholder = `__QUOTED_${index}__`;
+    processedText = processedText.replace(phrase, placeholder);
+  });
+  
+  // Split by whitespace and process each word
+  const words = processedText.split(/\s+/).filter(word => word.length > 0);
+  
+  // Replace placeholders back with original quoted text (without quotes)
+  const finalWords = words.map(word => {
+    const quotedIndex = word.match(/__QUOTED_(\d+)__/);
+    if (quotedIndex) {
+      const originalPhrase = quotedPhrases[parseInt(quotedIndex[1])];
+      return originalPhrase.slice(1, -1); // Remove quotes
+    }
+    // Remove trailing punctuation for regular words
+    return word.replace(/[.,!?;:]+$/, '');
+  });
+  
+  return finalWords;
+};
+
 export const ChatMessage = ({ message, taggedWords, isUser = true }: ChatMessageProps) => {
-  const words = message.split(/\s+/);
+  const words = parseMessage(message);
   
   const getTagDisplay = (tagValue: string) => {
     return AVAILABLE_TAGS.find(tag => tag.value === tagValue);
@@ -38,16 +66,18 @@ export const ChatMessage = ({ message, taggedWords, isUser = true }: ChatMessage
               const tagDisplay = tag ? getTagDisplay(tag) : null;
               
               return (
-                <span key={index} className="relative inline-block">
-                  <span className={tag ? 'font-medium' : ''}>{word}</span>
-                  {tagDisplay && (
-                    <Badge 
-                      variant="secondary" 
-                      className={`ml-1 text-xs ${tagDisplay.color}`}
-                    >
-                      {tagDisplay.label}
-                    </Badge>
-                  )}
+                <span key={index} className="relative inline-block group">
+                  <span 
+                    className={`relative ${tag ? 'font-medium px-2 py-1 rounded-md bg-primary/10 border border-primary/20' : ''}`}
+                    title={tagDisplay ? tagDisplay.label : undefined}
+                  >
+                    {word}
+                    {tagDisplay && (
+                      <span className="absolute -top-8 left-1/2 transform -translate-x-1/2 bg-popover border border-border text-popover-foreground px-2 py-1 rounded text-xs opacity-0 group-hover:opacity-100 transition-opacity duration-200 pointer-events-none whitespace-nowrap z-10">
+                        {tagDisplay.label}
+                      </span>
+                    )}
+                  </span>
                   {index < words.length - 1 && ' '}
                 </span>
               );

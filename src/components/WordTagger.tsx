@@ -23,9 +23,37 @@ const AVAILABLE_TAGS = [
   { value: "time", label: "Time", color: "bg-yellow-100 text-yellow-800" },
 ];
 
+const parseMessage = (text: string): string[] => {
+  // Handle quoted phrases as single words
+  const quotedPhrases = text.match(/"[^"]+"|'[^']+'/g) || [];
+  let processedText = text;
+  
+  // Replace quoted phrases with placeholders
+  quotedPhrases.forEach((phrase, index) => {
+    const placeholder = `__QUOTED_${index}__`;
+    processedText = processedText.replace(phrase, placeholder);
+  });
+  
+  // Split by whitespace and process each word
+  const words = processedText.split(/\s+/).filter(word => word.length > 0);
+  
+  // Replace placeholders back with original quoted text (without quotes)
+  const finalWords = words.map(word => {
+    const quotedIndex = word.match(/__QUOTED_(\d+)__/);
+    if (quotedIndex) {
+      const originalPhrase = quotedPhrases[parseInt(quotedIndex[1])];
+      return originalPhrase.slice(1, -1); // Remove quotes
+    }
+    // Remove trailing punctuation for regular words
+    return word.replace(/[.,!?;:]+$/, '');
+  });
+  
+  return finalWords;
+};
+
 export const WordTagger = ({ message, onTaggingComplete }: WordTaggerProps) => {
   const [wordTags, setWordTags] = useState<Record<string, string>>({});
-  const words = message.split(/\s+/).filter(word => word.length > 0);
+  const words = parseMessage(message);
 
   const handleTagWord = (wordIndex: number, tag: string) => {
     const word = words[wordIndex];
