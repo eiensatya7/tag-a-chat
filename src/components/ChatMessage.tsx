@@ -15,7 +15,7 @@ const AVAILABLE_TAGS = [
   { value: "time", label: "Time", color: "bg-yellow-100 text-yellow-800" },
 ];
 
-const parseMessage = (text: string): string[] => {
+const parseMessageForTagging = (text: string): string[] => {
   // Handle quoted phrases as single words
   const quotedPhrases = text.match(/"[^"]+"|'[^']+'/g) || [];
   let processedText = text;
@@ -44,7 +44,8 @@ const parseMessage = (text: string): string[] => {
 };
 
 export const ChatMessage = ({ message, taggedWords, isUser = true }: ChatMessageProps) => {
-  const words = parseMessage(message);
+  const cleanedWords = parseMessageForTagging(message);
+  const displayWords = message.split(/\s+/);
   
   const getTagDisplay = (tagValue: string) => {
     return AVAILABLE_TAGS.find(tag => tag.value === tagValue);
@@ -55,20 +56,25 @@ export const ChatMessage = ({ message, taggedWords, isUser = true }: ChatMessage
       <div
         className={`max-w-3xl rounded-2xl px-4 py-3 ${
           isUser
-            ? 'bg-chat-primary text-chat-primary-foreground'
-            : 'bg-card border border-border'
+            ? 'bg-muted/30 text-foreground border border-border'
+            : 'bg-muted/20 text-foreground border border-border'
         }`}
       >
         <div className="space-y-2">
           <div className="flex flex-wrap gap-1">
-            {words.map((word, index) => {
-              const tag = taggedWords[word];
+            {displayWords.map((word, index) => {
+              // Find matching cleaned word for tagging
+              const cleanedWord = cleanedWords.find(clean => 
+                word.replace(/[.,!?;:]+$/, '').toLowerCase() === clean.toLowerCase() ||
+                word.replace(/^["']|["']$/g, '').replace(/[.,!?;:]+$/, '').toLowerCase() === clean.toLowerCase()
+              );
+              const tag = cleanedWord ? taggedWords[cleanedWord] : null;
               const tagDisplay = tag ? getTagDisplay(tag) : null;
               
               return (
                 <span key={index} className="relative inline-block group">
                   <span 
-                    className={`relative ${tag ? 'font-medium px-2 py-1 rounded-md bg-primary/10 border border-primary/20' : ''}`}
+                    className={`relative ${tag ? 'font-medium px-2 py-1 rounded-md bg-primary/20 border border-primary/30' : ''}`}
                     title={tagDisplay ? tagDisplay.label : undefined}
                   >
                     {word}
@@ -78,7 +84,7 @@ export const ChatMessage = ({ message, taggedWords, isUser = true }: ChatMessage
                       </span>
                     )}
                   </span>
-                  {index < words.length - 1 && ' '}
+                  {index < displayWords.length - 1 && ' '}
                 </span>
               );
             })}
