@@ -61,6 +61,14 @@ export default {
 					'accent-foreground': 'hsl(var(--sidebar-accent-foreground))',
 					border: 'hsl(var(--sidebar-border))',
 					ring: 'hsl(var(--sidebar-ring))'
+				},
+				chat: {
+					primary: 'hsl(var(--chat-primary))',
+					'primary-foreground': 'hsl(var(--chat-primary-foreground))',
+					secondary: 'hsl(var(--chat-secondary))',
+					hover: 'hsl(var(--chat-hover))',
+					selected: 'hsl(var(--chat-selected))',
+					'selected-foreground': 'hsl(var(--chat-selected-foreground))'
 				}
 			},
 			borderRadius: {
@@ -84,11 +92,33 @@ export default {
 					to: {
 						height: '0'
 					}
+				},
+				'slide-up': {
+					from: {
+						transform: 'translateY(50vh)',
+						opacity: '0'
+					},
+					to: {
+						transform: 'translateY(0)',
+						opacity: '1'
+					}
+				},
+				'fade-in': {
+					from: {
+						opacity: '0',
+						transform: 'scale(0.95)'
+					},
+					to: {
+						opacity: '1',
+						transform: 'scale(1)'
+					}
 				}
 			},
 			animation: {
 				'accordion-down': 'accordion-down 0.2s ease-out',
-				'accordion-up': 'accordion-up 0.2s ease-out'
+				'accordion-up': 'accordion-up 0.2s ease-out',
+				'slide-up': 'slide-up 0.5s cubic-bezier(0.4, 0, 0.2, 1)',
+				'fade-in': 'fade-in 0.3s cubic-bezier(0.4, 0, 0.2, 1)'
 			}
 		}
 	},

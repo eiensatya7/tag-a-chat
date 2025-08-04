@@ -1,12 +1,127 @@
-// Update this page (the content is just a fallback if you fail to update the page)
+import { useState } from "react";
+import { ChatInput } from "@/components/ChatInput";
+import { WordTagger } from "@/components/WordTagger";
+import { ChatMessage } from "@/components/ChatMessage";
+import { TaggingModal } from "@/components/TaggingModal";
+
+type ChatState = 'initial' | 'tagging' | 'chat';
+
+interface Message {
+  id: string;
+  text: string;
+  taggedWords: Record<string, string>;
+  timestamp: Date;
+}
 
 const Index = () => {
-  return (
-    <div className="min-h-screen flex items-center justify-center bg-background">
-      <div className="text-center">
-        <h1 className="text-4xl font-bold mb-4">Welcome to Your Blank App</h1>
-        <p className="text-xl text-muted-foreground">Start building your amazing project here!</p>
+  const [chatState, setChatState] = useState<ChatState>('initial');
+  const [currentMessage, setCurrentMessage] = useState<string>("");
+  const [messages, setMessages] = useState<Message[]>([]);
+  const [showTaggingModal, setShowTaggingModal] = useState(false);
+  const [pendingMessage, setPendingMessage] = useState<string>("");
+
+  const handleInitialSubmit = (message: string) => {
+    setCurrentMessage(message);
+    setChatState('tagging');
+  };
+
+  const handleTaggingComplete = (taggedWords: Record<string, string>) => {
+    const newMessage: Message = {
+      id: Date.now().toString(),
+      text: currentMessage,
+      taggedWords,
+      timestamp: new Date(),
+    };
+    setMessages([newMessage]);
+    setChatState('chat');
+    setCurrentMessage("");
+  };
+
+  const handleChatSubmit = (message: string) => {
+    setPendingMessage(message);
+    setShowTaggingModal(true);
+  };
+
+  const handleModalTaggingComplete = (taggedWords: Record<string, string>) => {
+    const newMessage: Message = {
+      id: Date.now().toString(),
+      text: pendingMessage,
+      taggedWords,
+      timestamp: new Date(),
+    };
+    setMessages(prev => [...prev, newMessage]);
+    setShowTaggingModal(false);
+    setPendingMessage("");
+  };
+
+  if (chatState === 'initial') {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-background p-4">
+        <div className="w-full max-w-2xl text-center animate-fade-in">
+          <h1 className="text-4xl font-semibold mb-8 text-foreground">
+            What can I help with?
+          </h1>
+          <ChatInput 
+            onSubmit={handleInitialSubmit} 
+            placeholder="Ask anything"
+            className="w-full"
+          />
+        </div>
       </div>
+    );
+  }
+
+  if (chatState === 'tagging') {
+    return (
+      <div className="min-h-screen bg-background">
+        <div className="animate-slide-up pt-8">
+          <div className="w-full max-w-2xl mx-auto px-4 mb-8">
+            <ChatInput 
+              onSubmit={() => {}} 
+              placeholder="Ask anything"
+              className="w-full opacity-50 pointer-events-none"
+            />
+          </div>
+          <div className="container mx-auto px-4">
+            <WordTagger 
+              message={currentMessage} 
+              onTaggingComplete={handleTaggingComplete}
+            />
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  return (
+    <div className="min-h-screen bg-background flex flex-col">
+      <div className="flex-1 container mx-auto px-4 py-6 max-w-4xl">
+        <div className="space-y-4 mb-6">
+          {messages.map((message) => (
+            <ChatMessage
+              key={message.id}
+              message={message.text}
+              taggedWords={message.taggedWords}
+              isUser={true}
+            />
+          ))}
+        </div>
+      </div>
+      
+      <div className="border-t border-border bg-card/50 backdrop-blur-sm">
+        <div className="container mx-auto px-4 py-4 max-w-4xl">
+          <ChatInput 
+            onSubmit={handleChatSubmit} 
+            placeholder="Type your message..."
+          />
+        </div>
+      </div>
+
+      <TaggingModal
+        isOpen={showTaggingModal}
+        message={pendingMessage}
+        onComplete={handleModalTaggingComplete}
+      />
     </div>
   );
 };
