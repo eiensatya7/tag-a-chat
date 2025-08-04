@@ -63,27 +63,36 @@ export const ChatMessage = ({ message, taggedWords, isUser = true }: ChatMessage
         <div className="space-y-2">
           <div className="flex flex-wrap gap-1">
             {displayWords.map((word, index) => {
+              // Extract the actual word without punctuation and the punctuation separately
+              const wordMatch = word.match(/^(["']?)(.+?)(["']?)([.,!?;:]*)$/);
+              const leadingQuote = wordMatch ? wordMatch[1] : '';
+              const actualWord = wordMatch ? wordMatch[2] : word;
+              const trailingQuote = wordMatch ? wordMatch[3] : '';
+              const punctuation = wordMatch ? wordMatch[4] : '';
+              
               // Find matching cleaned word for tagging
               const cleanedWord = cleanedWords.find(clean => 
-                word.replace(/[.,!?;:]+$/, '').toLowerCase() === clean.toLowerCase() ||
-                word.replace(/^["']|["']$/g, '').replace(/[.,!?;:]+$/, '').toLowerCase() === clean.toLowerCase()
+                actualWord.toLowerCase() === clean.toLowerCase()
               );
               const tag = cleanedWord ? taggedWords[cleanedWord] : null;
               const tagDisplay = tag ? getTagDisplay(tag) : null;
               
               return (
                 <span key={index} className="relative inline-block group">
+                  {leadingQuote}
                   <span 
                     className={`relative ${tag ? 'font-medium px-2 py-1 rounded-md bg-primary/20 border border-primary/30' : ''}`}
                     title={tagDisplay ? tagDisplay.label : undefined}
                   >
-                    {word}
+                    {actualWord}
                     {tagDisplay && (
                       <span className="absolute -top-8 left-1/2 transform -translate-x-1/2 bg-popover border border-border text-popover-foreground px-2 py-1 rounded text-xs opacity-0 group-hover:opacity-100 transition-opacity duration-200 pointer-events-none whitespace-nowrap z-10">
                         {tagDisplay.label}
                       </span>
                     )}
                   </span>
+                  {trailingQuote}
+                  {punctuation}
                   {index < displayWords.length - 1 && ' '}
                 </span>
               );
