@@ -65,16 +65,19 @@ const Index = () => {
 
   if (chatState === 'initial') {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-background p-4">
-        <div className="w-full max-w-2xl text-center animate-fade-in">
-          <h1 className="text-4xl font-semibold mb-8 text-foreground">
-            What can I help with?
-          </h1>
-          <ChatInput 
-            onSubmit={handleInitialSubmit} 
-            placeholder="Ask anything"
-            className="w-full"
-          />
+      <div className="min-h-screen bg-background">
+        <TopBar onReset={handleReset} />
+        <div className="flex-1 flex items-center justify-center p-4">
+          <div className="w-full max-w-2xl text-center animate-fade-in">
+            <h1 className="text-4xl font-semibold mb-8 text-foreground">
+              What can I help with?
+            </h1>
+            <ChatInput 
+              onSubmit={handleInitialSubmit} 
+              placeholder="Ask anything"
+              className="w-full"
+            />
+          </div>
         </div>
       </div>
     );

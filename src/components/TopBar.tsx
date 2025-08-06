@@ -32,8 +32,7 @@ export const TopBar = ({ onReset }: TopBarProps) => {
             </Button>
             
             <Avatar className="h-8 w-8">
-              <AvatarImage src="https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=32&h=32&fit=crop&crop=face" alt="User" />
-              <AvatarFallback className="text-xs bg-muted">U</AvatarFallback>
+              <AvatarFallback className="text-xs bg-blue-500 text-white">U</AvatarFallback>
             </Avatar>
           </div>
         </div>
