@@ -9,8 +9,11 @@ export default defineConfig(({ mode }) => ({
     host: "::",
     port: 8080,
   },
+  esbuild: false,
   optimizeDeps: {
-    exclude: ['@esbuild/linux-x64', '@esbuild/darwin-x64', '@esbuild/win32-x64']
+    esbuildOptions: {
+      target: 'esnext'
+    }
   },
   plugins: [
     react(),
