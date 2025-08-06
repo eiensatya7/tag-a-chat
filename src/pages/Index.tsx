@@ -3,6 +3,7 @@ import { ChatInput } from "@/components/ChatInput";
 import { WordTagger } from "@/components/WordTagger";
 import { ChatMessage } from "@/components/ChatMessage";
 import { TaggingModal } from "@/components/TaggingModal";
+import { TopBar } from "@/components/TopBar";
 
 type ChatState = 'initial' | 'tagging' | 'chat';
 
@@ -54,6 +55,14 @@ const Index = () => {
     setPendingMessage("");
   };
 
+  const handleReset = () => {
+    setChatState('initial');
+    setMessages([]);
+    setCurrentMessage("");
+    setPendingMessage("");
+    setShowTaggingModal(false);
+  };
+
   if (chatState === 'initial') {
     return (
       <div className="min-h-screen flex items-center justify-center bg-background p-4">
@@ -74,6 +83,7 @@ const Index = () => {
   if (chatState === 'tagging') {
     return (
       <div className="min-h-screen bg-background">
+        <TopBar onReset={handleReset} />
         <div className="animate-slide-up pt-8">
           <div className="w-full max-w-2xl mx-auto px-4 mb-8">
             <ChatInput 
@@ -95,6 +105,7 @@ const Index = () => {
 
   return (
     <div className="min-h-screen bg-background flex flex-col">
+      <TopBar onReset={handleReset} />
       <div className="flex-1 container mx-auto px-4 py-6 max-w-4xl">
         <div className="space-y-4 mb-6">
           {messages.map((message) => (
