@@ -9,6 +9,9 @@ export default defineConfig(({ mode }) => ({
     host: "::",
     port: 8080,
   },
+  optimizeDeps: {
+    exclude: ['@esbuild/linux-x64', '@esbuild/darwin-x64', '@esbuild/win32-x64']
+  },
   plugins: [
     react(),
     mode === 'development' &&
